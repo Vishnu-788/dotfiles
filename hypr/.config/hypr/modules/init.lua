@@ -1,0 +1,7 @@
+require("modules.monitors")
+require("modules.autostart")
+require("modules.keybindings")
+require("modules.animations")
+require("modules.theme")
+require("modules.keybindings")
+require("modules.decorations")

@@ -1,0 +1,12 @@
+return {
+   "stevearc/dressing.nvim",
+   event = "VeryLazy",
+   opts = {
+      select = {
+         backend = { "telescope", "builtin" },
+         builtin = {
+            max_height = 6,
+         },
+      },
+   },
+}

@@ -1,0 +1,25 @@
+# Initial window size.
+
+window-width = 140
+window-height = 35
+
+window-decoration = true
+
+window-padding-x = 10
+window-padding-y = 10
+
+# font-feature = -calt, -liga, -dlig
+
+theme = Aura
+
+cursor-style = block
+cursor-style-blink = false
+shell-integration-features = no-cursor
+font-family = JetBrainsMono Nerd Font
+
+# Set transparency level (0.0 to 1.0, where 0.0 is invisible and 1.0 is solid)
+background = #000000
+background-opacity = 0.80
+
+# Optional: If you want background blur (requires a compositor like picom/KDE/GNOME)
+background-blur = true
