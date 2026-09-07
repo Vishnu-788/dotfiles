@@ -24,9 +24,6 @@ PanelWindow {
     }
 
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
-    Keys.onEscapePressed: panel.close()
-    Keys.onReturnPressed: panel.close()
-
     property alias service: wifiService
     property string selectedSsid: ""
     property bool passwdRequired: false
@@ -54,6 +51,10 @@ PanelWindow {
     // Main styled background
     Rectangle {
         anchors.fill: parent
+        focus: true
+
+        Keys.onEscapePressed: panel.close()
+
         color: "#11141C" // Nord0 - Polar Night
         radius: 12
         // border.color: "#3B4252" // Nord1
