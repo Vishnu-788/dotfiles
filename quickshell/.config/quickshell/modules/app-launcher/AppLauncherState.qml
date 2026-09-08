@@ -41,6 +41,11 @@ QtObject {
             list = list.slice(0, 12);
 
         recentIds = list;
-        settings.recentIdsSerialized = JSON.stringify(list);
+        _settings.recentIdsSerialized = JSON.stringify(list);
+    }
+
+    function clearRecents() {
+        recentIds = [];
+        _settings.recentIdsSerialized = "[]";
     }
 }
