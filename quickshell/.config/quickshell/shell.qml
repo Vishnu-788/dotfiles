@@ -3,6 +3,7 @@ import Quickshell.Io
 import QtQuick
 import "modules/wifi"
 import "modules/power-panel"
+import "modules/app-launcher"
 
 ShellRoot {
     Scope {
@@ -12,6 +13,10 @@ ShellRoot {
 
         PowerPanel {
             id: powerPanel
+        }
+
+        AppLauncher {
+            id: appLauncher
         }
 
         // Exposed over Quickshell's IPC so waybar (or a keybind) can call:
@@ -35,6 +40,13 @@ ShellRoot {
 
             function toggle(): void {
                 powerPanel.toggle();
+            }
+        }
+
+        IpcHandler {
+            target: "app-launcher"
+            function toggle() {
+               appLauncher.toggle()
             }
         }
     }

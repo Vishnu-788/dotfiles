@@ -1,4 +1,4 @@
-import Singleton
+pragma Singleton
 import QtQuick
 import QtCore
 import Quickshell
