@@ -30,6 +30,7 @@ PanelWindow {
 
     color: "transparent"
 
+    property string primaryFont: "JetBrainsMono Nerd Font"
     property string searchQuery: ""
     property int selectedIdx: 0
     readonly property bool isSearching: searchQuery.trim() !== ""
@@ -101,8 +102,7 @@ PanelWindow {
     }
 
     readonly property color accentFill: Qt.rgba("#ffffff", 0.18)
-    readonly property color accentIcon: Qt.rgba(Colors.colBlue.r, Colors.colBlue.g, Colors.colBlue.b, 0.28)
-    readonly property color fgDim: Qt.rgba(Colors.colFg.r, Colors.colFg.g, Colors.colFg.b, 0.65)
+    readonly property color fgDim: Qt.rgba(255, 255, 255, 0.65)
 
     readonly property int maxVisible: 7
     readonly property int itemH: 48
@@ -213,7 +213,7 @@ PanelWindow {
                             color: "#ffffff"
                             font {
                                 pixelSize: 13
-                                family: "JetBrainsMono Nerd Font"
+                                family: root.primaryFont
                             }
                             verticalAlignment: Text.AlignVCenter
                         }
@@ -224,7 +224,7 @@ PanelWindow {
                             opacity: 0.28
                             font {
                                 pixelSize: 13
-                                family: "JetBrainsMono Nerd Font"
+                                family: root.primaryFont
                             }
                             verticalAlignment: Text.AlignVCenter
                             visible: searchInput.text === ""
@@ -236,7 +236,7 @@ PanelWindow {
                             selectionColor: root.accentFill
                             font {
                                 pixelSize: 13
-                                family: "JetBrainsMono Nerd Font"
+                                family: root.primaryFont
                             }
                             verticalAlignment: TextInput.AlignVCenter
                             clip: true
@@ -304,7 +304,7 @@ PanelWindow {
                 opacity: 0.28
                 font {
                     pixelSize: 13
-                    family: "JetBrainsMono Nerd Font"
+                    family: root.primaryFont
                 }
             }
 
@@ -369,7 +369,7 @@ PanelWindow {
                                 text: modelData.name.charAt(0).toUpperCase()
                                 font {
                                     pixelSize: 15
-                                    family: "JetBrainsMono Nerd Font"
+                                    family: root.primaryFont
                                     weight: Font.Bold
                                 }
                                 color: "transparent"
@@ -389,7 +389,7 @@ PanelWindow {
                                 text: modelData.name
                                 font {
                                     pixelSize: 13
-                                    family: "JetBrainsMono Nerd Font"
+                                    family: root.primaryFont
                                     weight: appRow.sel ? Font.Medium : Font.Normal
                                 }
                                 color: appRow.sel ? Colors.colFg : root.fgDim
@@ -417,7 +417,7 @@ PanelWindow {
                                         text: "recent"
                                         font {
                                             pixelSize: 9
-                                            family: "JetBrainsMono Nerd Font"
+                                            family: root.primaryFont
                                         }
                                         color: "#11141C"
                                     }
@@ -427,7 +427,7 @@ PanelWindow {
                                     text: modelData.genericName
                                     font {
                                         pixelSize: 11
-                                        family: "JetBrainsMono Nerd Font"
+                                        family: root.primaryFont
                                     }
                                     color: Colors.colFg
                                     opacity: 0.35
