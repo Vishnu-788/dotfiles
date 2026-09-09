@@ -1,0 +1,19 @@
+add_newline = false
+# 1. Removed the () around $git_branch here so they aren't parsed as a conditional group
+format = """$directory$git_branch$character"""
+
+[directory]
+style = "bold #e95678"
+truncation_length = 3
+truncate_to_repo = false
+truncation_symbol = "../"
+format = "[ $path ]($style)"
+
+[git_branch]
+symbol = ""
+# Inline styles applied to separate parts of the format string
+format = '[$symbol git:](purple)[\(](#00C5FF)[$branch](bold red)[\)](#00C5FF) '
+
+[character]
+success_symbol = "[❯](bold #00ffaa)"
+error_symbol = "[❯](bold #ff007f)"
