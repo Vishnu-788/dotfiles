@@ -30,7 +30,7 @@ PanelWindow {
 
     color: "transparent"
 
-    property string primaryFont: "JetBrainsMono Nerd Font"
+    property string primaryFont: FontFamily.jetBrains
     property string searchQuery: ""
     property int selectedIdx: 0
     readonly property bool isSearching: searchQuery.trim() !== ""

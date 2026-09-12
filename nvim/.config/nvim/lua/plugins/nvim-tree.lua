@@ -46,7 +46,7 @@ return {
             },
             renderer = {
                highlight_git = true,
-               highlight_opened_files = "all",
+               highlight_opened_files = "none",
                icons = {
                   modified_placement = "right_align",
                   diagnostics_placement = "right_align",
