@@ -12,6 +12,13 @@ PanelWindow {
     WlrLayershell.keyboardFocus: AppLauncherState.launcherVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     WlrLayershell.namespace: "quickshell-launcher"
 
+    IpcHandler {
+        target: "app-launcher"
+        function toggle() {
+            root.toggle();
+        }
+    }
+
     anchors {
         top: true
         bottom: true
@@ -101,7 +108,7 @@ PanelWindow {
         }
     }
 
-    readonly property color accentFill: Qt.rgba("#ffffff", 0.18)
+    readonly property color accentFill: Qt.rgba(1, 1, 1, 0.80)
     readonly property color fgDim: Qt.rgba(255, 255, 255, 0.65)
 
     readonly property int maxVisible: 7
@@ -199,11 +206,6 @@ PanelWindow {
                     spacing: 10
 
                     Row {
-                        anchors {
-                            fill: parent
-                            topMargin: 10
-                        }
-
                         width: parent.width - 40
                         height: parent.height
                         spacing: 10
@@ -408,7 +410,10 @@ PanelWindow {
                                     width: recentLabel.width + 8
                                     height: 14
                                     radius: 4
-                                    color: Qt.rgba("#ffffff", 0.44)
+                                    // color: Qt.rgba("#ffffff", 0.44)
+                                    // color: "#ffffff"
+                                    // opacity: 0.44
+                                    color: Qt.rgba(1, 1, 1, 0.80)
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     Text {

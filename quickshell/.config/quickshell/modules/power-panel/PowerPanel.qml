@@ -1,4 +1,5 @@
 import Quickshell
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import Quickshell.Wayland
@@ -12,6 +13,13 @@ PanelWindow {
 
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
     WlrLayershell.exclusionMode: ExclusionMode.Ignore
+    IpcHandler {
+        target: "power-panel"
+
+        function toggle(): void {
+            panel.toggle();
+        }
+    }
 
     PowerService {
         id: service

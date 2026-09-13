@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Quickshell.Io
 
 PanelWindow {
     id: panel
@@ -12,6 +13,19 @@ PanelWindow {
     visible: false
     implicitWidth: 340
     implicitHeight: 460
+    IpcHandler {
+        target: "wifi"
+
+        function toggle(): void {
+            panel.toggle();
+        }
+        function open(): void {
+            panel.open();
+        }
+        function close(): void {
+            panel.close();
+        }
+    }
 
     // Transparent root to allow the inner rectangle to handle rounded corners
     color: "transparent"
