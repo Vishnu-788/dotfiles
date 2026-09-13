@@ -57,3 +57,8 @@ hl.window_rule({
     center = true,
     size = "1100 700"
 })
+
+
+
+
+
