@@ -2,6 +2,8 @@ pragma Singleton
 import QtQuick
 
 QtObject {
+    readonly property color primary: "#11141C"
+
     readonly property color colBg: "#070000"
     readonly property color colFg: "#FFF9E5"
 
