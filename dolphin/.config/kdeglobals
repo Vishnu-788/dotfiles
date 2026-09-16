@@ -149,6 +149,7 @@ toolBarFont=Google Sans Flex,10,-1,5,500,0,0,0,0,0,0,0,0,0,0,1,Medium
 Theme=WhiteSur
 
 [KDE]
+ShowDeleteCommand=false
 contrast=4
 frameContrast=0.2
 widgetStyle=Darkly
@@ -171,8 +172,8 @@ Speedbar Width=168
 View Style=Simple
 
 [PreviewSettings]
-EnableRemoteFolderThumbnail=false
-MaximumRemoteSize=3145728
+EnableRemoteFolderThumbnail=true
+MaximumRemoteSize=10485760
 
 [Sounds]
 Theme=freedesktop

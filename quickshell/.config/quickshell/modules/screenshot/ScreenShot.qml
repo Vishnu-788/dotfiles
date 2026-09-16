@@ -38,7 +38,10 @@ PanelWindow {
     }
 
     property var options: Backend.options
+    property var fileActions: Backend.options
+    property bool showFileActions: false
     property int selectedIdx: 0
+    property int selectedActionIdx: 0
     property int itemHeight: 48
     property int panelHeight: 45 + options.length * itemHeight
     property int panelWidth: 440
@@ -57,6 +60,12 @@ PanelWindow {
 
     function confirmSelection() {
         Backend.handleScreenShot(root.options[root.selectedIdx].id);
+        Backend.hide();
+    }
+
+    function confirmAction() {
+        Backend.handleFileAction();
+        showFileActions = false;
         Backend.hide();
     }
 
@@ -106,7 +115,11 @@ PanelWindow {
                 root.navigate((event.modifiers & Qt.ShiftModifier) || event.key === Qt.Key_Backtab ? -1 : 1);
                 event.accepted = true;
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                root.confirmSelection();
+                if (root.showFileActions) {
+                    root.confitmAction();
+                } else {
+                    root.confirmSelection();
+                }
                 event.accepted = true;
             } else if (event.key === Qt.Key_Escape) {
                 Backend.hide();
@@ -229,6 +242,122 @@ PanelWindow {
                         onEntered: root.selectedIdx = optionRow.index
                         onClicked: {
                             root.selectedIdx = optionRow.index;
+                            root.confirmSelection();
+                        }
+                    }
+                }
+            }
+        }
+        ListView {
+            id: actionListView
+            anchors {
+                fill: parent
+                margins: 12
+            }
+            spacing: 4
+            clip: true
+            model: root.fileActions
+
+            MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
+                onWheel: function (wheel) {
+                    if (wheel.angleDelta.y < 0) {
+                        root.navigate(1);
+                    } else {
+                        root.navigate(-1);
+                    }
+                }
+            }
+
+            delegate: Item {
+                id: actionRow
+                height: root.itemHeight
+                width: actionListView.width
+                required property int index
+                required property var modelData
+
+                property bool selected: root.selectedActionIdx === index
+
+                Rectangle {
+                    anchors.fill: parent
+                    radius: 12
+                    color: actionRow.selected ? "#1E2230" : "transparent"
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 100
+                        }
+                    }
+
+                    RowLayout {
+                        anchors {
+                            fill: parent
+                            leftMargin: 12
+                            rightMargin: 12
+                        }
+                        spacing: 12
+
+                        // Icon Bubble
+                        Rectangle {
+                            Layout.preferredWidth: 36
+                            Layout.preferredHeight: 36
+                            Layout.alignment: Qt.AlignVCenter
+                            radius: 9
+
+                            Image {
+                                id: actionIcon
+                                anchors.centerIn: parent
+                                width: 22
+                                height: 22
+                                source: modelData.icon !== "" ? "image://icon/" + modelData.icon : ""
+                                smooth: true
+                                mipmap: true
+                            }
+
+                            // Fallback if no icon is provided
+                            Text {
+                                anchors.centerIn: parent
+                                visible: actionIcon.status !== Image.Ready
+                                text: modelData.name.charAt(0).toUpperCase()
+                                font {
+                                    pixelSize: 15
+                                    family: root.primaryFont
+                                    weight: Font.Bold
+                                }
+                                color: actionRow.selected ? Colors.colFg : root.fgDim
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: 100
+                                    }
+                                }
+                            }
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter
+                            elide: Text.ElideRight
+                            text: modelData.name
+                            font {
+                                pixelSize: 13
+                                family: root.primaryFont
+                                weight: actionRow.selected ? Font.Medium : Font.Normal
+                            }
+                            color: actionRow.selected ? Colors.colFg : root.fgDim
+                            Behavior on color {
+                                ColorAnimation {
+                                    duration: 100
+                                }
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onEntered: root.selectedIdx = actionRow.index
+                        onClicked: {
+                            root.selectedIdx = actionRow.index;
                             root.confirmSelection();
                         }
                     }
