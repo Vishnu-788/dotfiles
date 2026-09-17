@@ -37,7 +37,15 @@ PanelWindow {
 
     color: "transparent"
 
+    // Theme Colors 
     property string primaryFont: FontFamily.jetBrains
+    property color colFg: Colors.colFg
+    property color colFgDim: Colors.colFgDim
+    property color colBg: Colors.colBg
+    property color colBgDim: Colors.colBgDim
+    property color accentFill: Colors.accentFill
+
+
     property string searchQuery: ""
     property int selectedIdx: 0
     readonly property bool isSearching: searchQuery.trim() !== ""
@@ -108,9 +116,6 @@ PanelWindow {
         }
     }
 
-    readonly property color accentFill: Qt.rgba(1, 1, 1, 0.80)
-    readonly property color fgDim: Qt.rgba(255, 255, 255, 0.65)
-
     readonly property int maxVisible: 7
     readonly property int itemH: 48
     readonly property int panelW: 540
@@ -139,9 +144,9 @@ PanelWindow {
 
         clip: true
 
-        color: "#11141C"
+        color: root.colBg
         radius: 18
-        border.color: Qt.alpha("#11141C", 0.10)
+        // border.color: Qt.alpha("#11141C", 0.10)
         border.width: 1
 
         opacity: AppLauncherState.launcherVisible ? 1 : 0
@@ -183,7 +188,8 @@ PanelWindow {
                 width: parent.width
                 height: 44
                 radius: 10
-                color: Qt.alpha("#11141C", 0.8)
+                // color: Qt.alpha("#11141C", 0.8)
+                color: root.colBg
 
                 Rectangle {
                     anchors.fill: parent
@@ -202,6 +208,7 @@ PanelWindow {
                         fill: parent
                         leftMargin: 14
                         rightMargin: 14
+                        topMargin: 14
                     }
                     spacing: 10
 
@@ -212,7 +219,7 @@ PanelWindow {
 
                         Text {
                             text: "\uf002"   // nf-fa-search
-                            color: "#ffffff"
+                            color: root.colFg
                             font {
                                 pixelSize: 13
                                 family: root.primaryFont
@@ -222,7 +229,7 @@ PanelWindow {
 
                         Text {
                             text: "Search Apps..."
-                            color: "#ffffff"
+                            color: root.colFg
                             opacity: 0.28
                             font {
                                 pixelSize: 13
@@ -234,7 +241,7 @@ PanelWindow {
 
                         TextInput {
                             id: searchInput
-                            color: "#ffffff"
+                            color: root.colFg
                             selectionColor: root.accentFill
                             font {
                                 pixelSize: 13
@@ -326,7 +333,7 @@ PanelWindow {
                         topMargin: 2
                         bottomMargin: 2
                     }
-                    color: appRow.sel ? "#1E2230" : "transparent"
+                    color: appRow.sel ? root.colBgDim : "transparent"
                     Behavior on color {
                         ColorAnimation {
                             duration: 100
@@ -394,7 +401,7 @@ PanelWindow {
                                     family: root.primaryFont
                                     weight: appRow.sel ? Font.Medium : Font.Normal
                                 }
-                                color: appRow.sel ? Colors.colFg : root.fgDim
+                                color: appRow.sel ? Colors.colFg : root.colFgDim
                                 Behavior on color {
                                     ColorAnimation {
                                         duration: 100
@@ -413,7 +420,7 @@ PanelWindow {
                                     // color: Qt.rgba("#ffffff", 0.44)
                                     // color: "#ffffff"
                                     // opacity: 0.44
-                                    color: Qt.rgba(1, 1, 1, 0.80)
+                                    color: root.accentFill
                                     anchors.verticalCenter: parent.verticalCenter
 
                                     Text {
@@ -424,7 +431,7 @@ PanelWindow {
                                             pixelSize: 9
                                             family: root.primaryFont
                                         }
-                                        color: "#11141C"
+                                        color: root.colBg
                                     }
                                 }
                                 Text {
