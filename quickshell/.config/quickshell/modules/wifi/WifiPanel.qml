@@ -6,6 +6,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Quickshell.Io
+import "../../theme"
 
 PanelWindow {
     id: panel
@@ -38,9 +39,18 @@ PanelWindow {
     }
 
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+
     property alias service: wifiService
     property string selectedSsid: ""
     property bool passwdRequired: false
+
+    // Theme
+    property color colBg: Colors.colBg
+    property color colFg: Colors.colFg
+    property color colBgDim: Colors.colBgDim
+    property color colFgDim: Colors.colFgDim
+    property color accentFill: Colors.accentFill
+    property string primaryFont: FontFamily.jetBrains
 
     WifiService {
         id: wifiService
@@ -69,9 +79,9 @@ PanelWindow {
 
         Keys.onEscapePressed: panel.close()
 
-        color: "#11141C" // Nord0 - Polar Night
+        color: panel.colBg
         radius: 12
-        // border.color: "#3B4252" // Nord1
+        // border.color: panel.colBgDim
         // border.width: 1
 
         ColumnLayout {
@@ -86,9 +96,12 @@ PanelWindow {
 
                 Text {
                     text: "Wi-Fi"
-                    color: "#ECEFF4" // Nord6
-                    font.pixelSize: 16
-                    font.bold: true
+                    color: panel.colFg
+                    font {
+                        pixelSize: 13
+                        bold: true
+                        family: panel.primaryFont
+                    }
                 }
 
                 // Smooth Pill Toggle Switch
@@ -96,7 +109,7 @@ PanelWindow {
                     width: 36
                     height: 20
                     radius: 10
-                    color: wifiService.enabled ? "#A3BE8C" : "#4C566A" // Nord14 (Green) : Nord3 (Gray)
+                    color: wifiService.enabled ? "#A3BE8C" : panel.colBgDim // Green when on, theme-dim when off
 
                     Behavior on color {
                         ColorAnimation {
@@ -109,7 +122,7 @@ PanelWindow {
                         width: 16
                         height: 16
                         radius: 8
-                        color: "#ECEFF4" // Nord6
+                        color: panel.colFg
                         y: 2
                         x: wifiService.enabled ? parent.width - width - 2 : 2
 
@@ -140,7 +153,7 @@ PanelWindow {
                     visible: wifiService.enabled
                     implicitWidth: rescanText.width + 16
                     implicitHeight: rescanText.height + 8
-                    color: rescanMouse.containsMouse ? "#434C5E" : "transparent" // Nord2 on hover
+                    color: rescanMouse.containsMouse ? panel.colBgDim : "transparent"
                     radius: 6
 
                     Behavior on color {
@@ -153,8 +166,11 @@ PanelWindow {
                         id: rescanText
                         anchors.centerIn: parent
                         text: wifiService.scanning ? "Scanning…" : "⟳ Rescan"
-                        color: "#88C0D0" // Nord8 - Frost
-                        font.pixelSize: 13
+                        color: panel.accentFill
+                        font {
+                            family: panel.primaryFont
+                            pixelSize: 13
+                        }
                     }
 
                     MouseArea {
@@ -171,9 +187,12 @@ PanelWindow {
             Text {
                 visible: wifiService.lastError.length > 0 && wifiService.enabled
                 text: wifiService.lastError
-                color: "#BF616A" // Nord11 - Aurora (Red)
+                color: "#BF616A" // Semantic error color - no theme token for this yet
                 wrapMode: Text.WordWrap
-                font.pixelSize: 13
+                font {
+                    pixelSize: 13
+                    family: panel.primaryFont
+                }
                 Layout.fillWidth: true
             }
 
@@ -196,8 +215,8 @@ PanelWindow {
                     height: 48
                     radius: 8
 
-                    color: modelData.ssid === panel.selectedSsid ? "#434C5E" // Nord2 - Selected
-                    : (netMouse.containsMouse ? "#3B4252" : "transparent") // Nord1 - Hover
+                    color: modelData.ssid === panel.selectedSsid ? panel.colBgDim // Selected
+                    : (netMouse.containsMouse ? panel.colBgDim : "transparent") // Hover
 
                     Behavior on color {
                         ColorAnimation {
@@ -212,21 +231,23 @@ PanelWindow {
 
                         Text {
                             text: modelData.inUse ? "\u25CF" : (modelData.security.length > 0 ? "\uD83D\uDD12" : "\uD83D\uDCF6")
-                            color: modelData.inUse ? "#A3BE8C" : "#D8DEE9" // Nord14 : Nord4
+                            color: modelData.inUse ? "#A3BE8C" : panel.colFgDim
                             font.pixelSize: 14
                         }
                         Text {
                             text: modelData.ssid
-                            color: modelData.ssid === panel.selectedSsid ? "#ECEFF4" : "#D8DEE9"
+                            color: modelData.ssid === panel.selectedSsid ? panel.colFg : panel.colFgDim
                             font.bold: modelData.ssid === panel.selectedSsid
                             elide: Text.ElideRight
                             Layout.fillWidth: true
                             font.pixelSize: 14
+                            font.family: panel.primaryFont
                         }
                         Text {
                             text: modelData.signal + "%"
-                            color: "#4C566A" // Nord3 - Dimmed text
+                            color: panel.colFgDim
                             font.pixelSize: 12
+                            font.family: panel.primaryFont
                         }
                     }
 
@@ -256,9 +277,10 @@ PanelWindow {
                 Text {
                     anchors.centerIn: parent
                     text: "Wi-Fi is turned off"
-                    color: "#4C566A" // Nord3
+                    color: panel.colFgDim
                     font.pixelSize: 14
                     font.italic: true
+                    font.family: panel.primaryFont
                 }
             }
 
@@ -272,16 +294,17 @@ PanelWindow {
                     id: passwordField
                     visible: panel.passwdRequired
                     placeholderText: "Password"
-                    placeholderTextColor: "#4C566A"
-                    color: "#ECEFF4"
+                    placeholderTextColor: panel.colFgDim
+                    color: panel.colFg
                     echoMode: TextInput.Password
                     Layout.fillWidth: true
                     font.pixelSize: 14
+                    font.family: panel.primaryFont
 
                     background: Rectangle {
-                        color: "#3B4252" // Nord1
+                        color: panel.colBgDim
                         radius: 6
-                        border.color: passwordField.activeFocus ? "#88C0D0" : "transparent"
+                        border.color: passwordField.activeFocus ? panel.accentFill : "transparent"
                         border.width: 1
 
                         Behavior on border.color {
@@ -300,8 +323,9 @@ PanelWindow {
 
                     contentItem: Text {
                         text: connectButton.text
-                        color: "#2E3440"
+                        color: panel.colBg
                         font.bold: true
+                        font.family: panel.primaryFont
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                     }
@@ -309,7 +333,7 @@ PanelWindow {
                     background: Rectangle {
                         implicitWidth: 80
                         implicitHeight: passwordField.height
-                        color: connectButton.down ? "#81A1C1" : "#88C0D0"
+                        color: connectButton.down ? panel.colFgDim : panel.accentFill
                         radius: 6
                     }
 
