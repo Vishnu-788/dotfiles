@@ -417,9 +417,6 @@ PanelWindow {
                                     width: recentLabel.width + 8
                                     height: 14
                                     radius: 4
-                                    // color: Qt.rgba("#ffffff", 0.44)
-                                    // color: "#ffffff"
-                                    // opacity: 0.44
                                     color: root.accentFill
                                     anchors.verticalCenter: parent.verticalCenter
 

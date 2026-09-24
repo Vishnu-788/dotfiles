@@ -43,22 +43,11 @@ Singleton {
         }
 
         onExited: (exitCode, exitStatus) => {
-            console.log(`[shotProc] hyprctl dispatch exited code=${exitCode} at ${Date.now()}`);
+            console.log(`[shotProc] hyprctl dispatch exited code=${exitCode} at ${Date.now()} and exit status: ${exitStatus}`);
         }
     }
 
-    // --- capture completion watcher (polls for the file since hyprctl exec is fire-and-forget) ---
-    Process {
-        id: checkFileProc
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                captureWatchTimer.stop();
-                root.captureInProgress = false;
-                root.notify("Screenshot saved", root.lastPath, "normal");
-            }
-        // non-zero exit means file doesn't exist yet — keep polling
-        }
-    }
+
 
     Timer {
         id: captureWatchTimer

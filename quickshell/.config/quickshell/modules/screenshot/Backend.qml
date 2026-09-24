@@ -1,10 +1,12 @@
 pragma Singleton
+
 import QtQuick
 import Quickshell
-import QtCore
 import Quickshell.Io
 
-QtObject {
+Singleton {
+    // --- capture completion watcher (polls for the file since hyprctl exec is fire-and-forget) ---
+    id: root
     property var options: [
         {
             id: 0,
@@ -50,22 +52,73 @@ QtObject {
         },
     ]
 
+    enum CaptureState {
+        Idle,
+        Captured,
+        Failed
+    }
+
     property string screenshotDir: Quickshell.env("HOME") + "/Pictures/Screenshots"
-
     property bool panelVisible: false
-    property bool captured: false
+    property int shotState: Backend.CaptureState.Idle
+    property bool isFocused: true
 
-    // --- notifications ---
-    // Process {
-    //     id: notifyProc
-    // }
-    //
-    // function notify(summary, body, urgency) {
-    //     notifyProc.exec(["notify-send", "-u", urgency || "normal", "-t", "3000", summary, body || ""]);
-    // }
-    //
+    Process {
+        id: fileCheckProc
+        stderr: StdioCollector {
+            id: captureErr
+        }
+        onExited: exitCode => {
+            if (exitCode === 0) {
+                root.panelVisible = true;
+                root.shotState = Backend.CaptureState.Captured;
+                console.log("Success");
+                root.notify("Screenshot is success", captureErr.text, "low");
+            } else {
+                console.log("Failed");
+                console.log("text: " + captureErr.text);
+                console.log("code: " + exitCode);
+                Backend.handleFailure();
+                root.notify("Screenshot Failed", captureErr.text, "critical");
+            }
+            root.isFocused = true;
+        }
+    }
+
+    Process {
+        id: notifyProc
+        running: false
+    }
+
+    Timer {
+        id: verifyTimer
+        interval: 1000
+        repeat: false
+        running: false
+        onTriggered: fileCheckProc.running = true
+    }
+
+    function runFileCheck() {
+        fileCheckProc.command = ["test", "-e", CaptureService.getLastPath()];
+        verifyTimer.restart();
+    }
+
+    function notify(title, body, urgencyLevel) {
+        notifyProc.command = ["notify-send", "-u", urgencyLevel, title, body];
+        notifyProc.running = true;
+    }
+
     function toggle() {
-        panelVisible = !panelVisible;
+        if (panelVisible) {
+            panelVisible = false;
+        } else {
+            panelVisible = true;
+        }
+    }
+
+    function handleFailure() {
+        panelVisible = false;
+        shotState = Backend.CaptureState.Idle;
     }
 
     function show() {
@@ -76,10 +129,30 @@ QtObject {
         panelVisible = false;
     }
 
+    function close() {
+        hide();
+    }
+
+    function performAction(actionId) {
+        const act = fileActions.find(a => a.id === actionId);
+        const fileTempPath = CaptureService.getLastPath();
+
+        switch (actionId) {
+        case 0: // Save
+            break;
+        case 1: // Copy
+            break;
+        case 2: // Save and Copy
+            break;
+        }
+    }
+
     function handleScreenShot(optionId) {
         const opt = options.find(o => o.id === optionId);
+        root.isFocused = false;
         if (!opt)
             return;
         CaptureService.capture(optionId, opt);
+        runFileCheck();
     }
 }

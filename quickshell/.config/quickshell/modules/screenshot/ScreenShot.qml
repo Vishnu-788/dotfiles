@@ -8,6 +8,8 @@ import "../../theme"
 PanelWindow {
     id: root
 
+    focusable: focused
+
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: Backend.panelVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     WlrLayershell.namespace: "screenshot"
@@ -37,15 +39,21 @@ PanelWindow {
         anchors.fill: parent
     }
 
+    readonly property bool focused: Backend.isFocused
+
     property var options: Backend.options
-    property var fileActions: Backend.options
-    property bool showFileActions: false
+    property int captureState: Backend.CaptureState.Idle
+    property var fileActions: Backend.fileActions
     property int selectedIdx: 0
     property int selectedActionIdx: 0
     property int itemHeight: 48
-    property int panelHeight: 45 + options.length * itemHeight
+    property int panelHeight: 45 + (options.length + 1) * itemHeight
     property int panelWidth: 440
-    readonly property color fgDim: Qt.rgba(255, 255, 255, 0.65)
+
+    property color colBg: Colors.colBg
+    property color colFg: Colors.colFg
+    property color fgDim: Colors.colFgDim
+    property color colBgDim: Colors.colBgDim
     property string primaryFont: FontFamily.jetBrains
     property int primaryFontSize: FontFamily.pixelSize
 
@@ -54,25 +62,23 @@ PanelWindow {
     }
 
     function navigate(delta) {
-        let size = options.length;
+        let size = captureState === Backend.CaptureState.Idle ? options.length : fileActions.length;
         selectedIdx = (selectedIdx + delta + size) % size;
     }
 
-    function confirmSelection() {
+    function capture() {
         Backend.handleScreenShot(root.options[root.selectedIdx].id);
         Backend.hide();
     }
 
-    function confirmAction() {
-        Backend.handleFileAction();
-        showFileActions = false;
-        Backend.hide();
+    function performAction() {
+        Backend.handleFileAction(root.fileActions[root.selectedActionIdx].id);
     }
 
     MouseArea {
         anchors.fill: parent
         enabled: Backend.panelVisible
-        onClicked: Backend.hide()
+        onClicked: Backend.close()
     }
 
     Rectangle {
@@ -101,7 +107,7 @@ PanelWindow {
             }
         }
 
-        color: Colors.primary
+        color: root.colBg
         radius: 20
 
         Keys.onPressed: function (event) {
@@ -115,10 +121,10 @@ PanelWindow {
                 root.navigate((event.modifiers & Qt.ShiftModifier) || event.key === Qt.Key_Backtab ? -1 : 1);
                 event.accepted = true;
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                if (root.showFileActions) {
-                    root.confitmAction();
+                if (root.captured) {
+                    root.performAction();
                 } else {
-                    root.confirmSelection();
+                    root.capture();
                 }
                 event.accepted = true;
             } else if (event.key === Qt.Key_Escape) {
@@ -132,11 +138,50 @@ PanelWindow {
             onClicked: {}
         }
 
+        Rectangle {
+            id: titleBar
+            width: parent.width
+            height: 45
+            color: "transparent"
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+
+            RowLayout {
+                anchors {
+                    fill: parent
+                    leftMargin: 16
+                    rightMargin: 16
+                    topMargin: 16
+                }
+                spacing: 8
+
+                Text {
+                    Layout.fillWidth: true
+                    text: "Screenshots Menu"
+                    color: root.colFg
+                    font {
+                        family: root.primaryFont
+                        pixelSize: 16
+                        weight: Font.Medium
+                    }
+                }
+            }
+        }
+
+        // Options one -> For the screenshots.
         ListView {
             id: listView
+            visible: root.captureState === Backend.CaptureState.Idle
             anchors {
-                fill: parent
-                margins: 12
+                top: titleBar.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+                topMargin: 12
+                bottomMargin: 12
             }
             spacing: 4
             clip: true
@@ -165,8 +210,7 @@ PanelWindow {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: 12
-                    color: optionRow.selected ? "#1E2230" : "transparent"
+                    color: optionRow.selected ? root.colBgDim : "transparent"
                     Behavior on color {
                         ColorAnimation {
                             duration: 100
@@ -242,16 +286,22 @@ PanelWindow {
                         onEntered: root.selectedIdx = optionRow.index
                         onClicked: {
                             root.selectedIdx = optionRow.index;
-                            root.confirmSelection();
+                            root.capture();
                         }
                     }
                 }
             }
         }
+
+        // Options 2: For the actions on the file.
         ListView {
             id: actionListView
+            visible: root.captureState === Backend.CaptureState.Captured
             anchors {
-                fill: parent
+                top: titleBar.bottom
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
                 margins: 12
             }
             spacing: 4
@@ -282,7 +332,7 @@ PanelWindow {
                 Rectangle {
                     anchors.fill: parent
                     radius: 12
-                    color: actionRow.selected ? "#1E2230" : "transparent"
+                    color: actionRow.selected ? root.colBgDim : "transparent"
                     Behavior on color {
                         ColorAnimation {
                             duration: 100
@@ -358,7 +408,7 @@ PanelWindow {
                         onEntered: root.selectedIdx = actionRow.index
                         onClicked: {
                             root.selectedIdx = actionRow.index;
-                            root.confirmSelection();
+                            root.capture();
                         }
                     }
                 }
