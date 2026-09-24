@@ -7,42 +7,40 @@ import QtQuick
 Singleton {
     id: root
 
-    property bool focused: true
     property bool capturing: false
+
+    signal captured(string path)   // emitted on success
+    signal cancelled()             // emitted on Escape or error
 
     Process {
         id: proc
-        // exec replaces the shell with slurp, so the exit code below is slurp's own
-        command: ["sh", "-c", "exec slurp </dev/null"]
+        command: ["sh", "-c", [
+            "dir=\"/tmp/Screenshots\"",
+            "mkdir -p \"$dir\"",
+            "f=\"$dir/$(date +%Y%m%d-%H%M%S).png\"",
+            "geom=$(slurp </dev/null) || exit 1",   // stdin fix + bail out if cancelled
+            "grim -g \"$geom\" \"$f\" || exit 2",
+            "echo \"$f\""
+        ].join("; ")]
 
-        stdout: StdioCollector {
-            id: out
-        }
-        stderr: StdioCollector {
-            id: err
-        }
+        stdout: StdioCollector { id: out }
+        stderr: StdioCollector { id: err }
 
-        onStarted: console.log("slurp started")
         onExited: (code, status) => {
-            console.log("exited with code", code, "geometry:", out.text.trim(), "stderr:", err.text.trim());
-            root.focused = true;
-            root.capturing = false;
-        }
-    }
-
-    Timer {
-        id: captureTimer
-        interval: 200
-        onTriggered: {
-            console.log("Calling the process");
-            proc.running = true;
+            root.capturing = false
+            if (code === 0) {
+                console.log("saved:", out.text.trim())
+                root.captured(out.text.trim())
+            } else {
+                console.log("capture failed/cancelled, code", code, err.text.trim())
+                root.cancelled()
+            }
         }
     }
 
     function capture() {
-        capturing = true;
-        focused = false;
-        captureTimer.start();
-        console.log("Triggered");
+        if (proc.running) return
+        capturing = true
+        proc.running = true
     }
 }

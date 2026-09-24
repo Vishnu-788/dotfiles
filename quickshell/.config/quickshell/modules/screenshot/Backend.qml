@@ -61,52 +61,6 @@ Singleton {
     property string screenshotDir: Quickshell.env("HOME") + "/Pictures/Screenshots"
     property bool panelVisible: false
     property int shotState: Backend.CaptureState.Idle
-    property bool isFocused: true
-
-    Process {
-        id: fileCheckProc
-        stderr: StdioCollector {
-            id: captureErr
-        }
-        onExited: exitCode => {
-            if (exitCode === 0) {
-                root.panelVisible = true;
-                root.shotState = Backend.CaptureState.Captured;
-                console.log("Success");
-                root.notify("Screenshot is success", captureErr.text, "low");
-            } else {
-                console.log("Failed");
-                console.log("text: " + captureErr.text);
-                console.log("code: " + exitCode);
-                Backend.handleFailure();
-                root.notify("Screenshot Failed", captureErr.text, "critical");
-            }
-            root.isFocused = true;
-        }
-    }
-
-    Process {
-        id: notifyProc
-        running: false
-    }
-
-    Timer {
-        id: verifyTimer
-        interval: 1000
-        repeat: false
-        running: false
-        onTriggered: fileCheckProc.running = true
-    }
-
-    function runFileCheck() {
-        fileCheckProc.command = ["test", "-e", CaptureService.getLastPath()];
-        verifyTimer.restart();
-    }
-
-    function notify(title, body, urgencyLevel) {
-        notifyProc.command = ["notify-send", "-u", urgencyLevel, title, body];
-        notifyProc.running = true;
-    }
 
     function toggle() {
         if (panelVisible) {
@@ -131,6 +85,7 @@ Singleton {
 
     function close() {
         hide();
+        shotState = Backend.CaptureState.Idle;
     }
 
     function performAction(actionId) {
