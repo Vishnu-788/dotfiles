@@ -1,0 +1,4 @@
+singleton CaptureService 1.0 CaptureService.qml
+singleton Backend 1.0 Backend.qml
+ScreenShot 1.0 ScreenShot.qml
+

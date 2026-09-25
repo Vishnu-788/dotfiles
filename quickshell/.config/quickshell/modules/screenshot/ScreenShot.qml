@@ -8,8 +8,6 @@ import "../../theme"
 PanelWindow {
     id: root
 
-    focusable: focused
-
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: Backend.panelVisible ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
     WlrLayershell.namespace: "screenshot"
@@ -39,17 +37,6 @@ PanelWindow {
         anchors.fill: parent
     }
 
-    readonly property bool focused: Backend.isFocused
-
-    property var options: Backend.options
-    property int captureState: Backend.CaptureState.Idle
-    property var fileActions: Backend.fileActions
-    property int selectedIdx: 0
-    property int selectedActionIdx: 0
-    property int itemHeight: 48
-    property int panelHeight: 45 + (options.length + 1) * itemHeight
-    property int panelWidth: 440
-
     property color colBg: Colors.colBg
     property color colFg: Colors.colFg
     property color fgDim: Colors.colFgDim
@@ -57,22 +44,43 @@ PanelWindow {
     property string primaryFont: FontFamily.jetBrains
     property int primaryFontSize: FontFamily.pixelSize
 
+    property var options: Backend.options
+    property int captureState: Backend.captureState
+    property var fileActions: Backend.fileActions
+    property int selectedIdx: 0
+    property int selectedActionIdx: 0
+    property int itemHeight: 48
+    property int panelHeight: 45 + (getOptionsLength() + 1) * itemHeight
+    property int panelWidth: 440
+
+    readonly property bool isCapturing: Backend.isCapturing
+
     function toggle() {
         Backend.toggle();
     }
 
     function navigate(delta) {
-        let size = captureState === Backend.CaptureState.Idle ? options.length : fileActions.length;
-        selectedIdx = (selectedIdx + delta + size) % size;
+        let size;
+
+        if (captureState === Backend.CaptureState.Idle) {
+            size = options.length;
+            selectedIdx = (selectedIdx + delta + size) % size;
+        } else {
+            size = fileActions.length;
+            selectedActionIdx = (selectedActionIdx + delta + size) % size;
+        }
     }
 
     function capture() {
-        Backend.handleScreenShot(root.options[root.selectedIdx].id);
-        Backend.hide();
+        Backend.handleScreenshot(root.options[root.selectedIdx].id);
     }
 
     function performAction() {
-        Backend.handleFileAction(root.fileActions[root.selectedActionIdx].id);
+        Backend.handleAction(root.fileActions[root.selectedActionIdx].id);
+    }
+
+    function getOptionsLength() {
+        return root.captureState === Backend.CaptureState.Idle ? root.options.length : root.fileActions.length;
     }
 
     MouseArea {
@@ -121,14 +129,14 @@ PanelWindow {
                 root.navigate((event.modifiers & Qt.ShiftModifier) || event.key === Qt.Key_Backtab ? -1 : 1);
                 event.accepted = true;
             } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                if (root.captured) {
-                    root.performAction();
-                } else {
+                if (root.captureState === Backend.CaptureState.Idle) {
                     root.capture();
+                } else {
+                    root.performAction();
                 }
                 event.accepted = true;
             } else if (event.key === Qt.Key_Escape) {
-                Backend.hide();
+                Backend.close();
                 event.accepted = true;
             }
         }
@@ -174,7 +182,7 @@ PanelWindow {
         // Options one -> For the screenshots.
         ListView {
             id: listView
-            visible: root.captureState === Backend.CaptureState.Idle
+            visible: root.captureState === Backend.CaptureState.Idle && !root.isCapturing
             anchors {
                 top: titleBar.bottom
                 left: parent.left
@@ -277,16 +285,6 @@ PanelWindow {
                                     duration: 100
                                 }
                             }
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onEntered: root.selectedIdx = optionRow.index
-                        onClicked: {
-                            root.selectedIdx = optionRow.index;
-                            root.capture();
                         }
                     }
                 }
@@ -399,16 +397,6 @@ PanelWindow {
                                     duration: 100
                                 }
                             }
-                        }
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        onEntered: root.selectedIdx = actionRow.index
-                        onClicked: {
-                            root.selectedIdx = actionRow.index;
-                            root.capture();
                         }
                     }
                 }

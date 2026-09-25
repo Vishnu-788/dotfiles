@@ -6,6 +6,9 @@ import QtQuick
 Singleton {
     id: root
 
+    signal screenshotCaptured(string path)
+    signal screenshotFailed(string code, string err)
+
     // Function to get the screenshot name.
     function getTimeStampedName() {
         const d = new Date();
@@ -18,19 +21,7 @@ Singleton {
     }
 
     property string tempPath: "/tmp/ScreenShots"
-
-    property bool captureInProgress: false
-    property string lastPath: ""
-    property string lastStderr: ""
-
     property bool capturing: false
-
-    signal captured(string path)
-    signal cancelled
-
-    function getLastPath() {
-        return root.lastPath;
-    }
 
     function isCapturing() {
         return root.capturing;
@@ -47,13 +38,13 @@ Singleton {
         }
 
         onExited: (code, status) => {
-            root.capturing = false;
             if (code === 0) {
-                root.captured(captureOut.text.trim());
+                root.screenshotCaptured(captureOut.text.trim());
             } else {
-                console.log("capture failed/cancelled, code", code, captureErr.text.trim());
-                root.cancelled();
+                root.screenshotFailed(code, captureErr.text.trim());
             }
+
+            root.capturing = false;
         }
     }
 
@@ -65,15 +56,13 @@ Singleton {
         captureProcess.running = true;
     }
 
-    function captureFullScreen() {
+    function captureFullscreen() {
         const path = `${tempPath}/${getTimeStampedName()}.png`;
-        root.lastPath;
         runCapture(['mkdir -p "$(dirname "$1")"', 'grim "$1" || exit 2', 'echo "$1"'].join("; "), path);
     }
 
     function captureSlurp() {
         const path = `${tempPath}/${getTimeStampedName()}.png`;
-        root.lastPath;
         runCapture(['mkdir -p "$(dirname "$1")"', 'geom=$(slurp </dev/null) || exit 1', 'grim -g "$geom" "$1" || exit 2', 'echo "$1"'].join("; "), path);
     }
 }
