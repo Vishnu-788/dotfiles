@@ -78,7 +78,4 @@ hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl set 5%-"),
 
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 
--- Screen shots
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd("~/.local/bin/screenshot.sh"))
-
 hl.bind("CTRL + SHIFT + B", hl.dsp.exec_cmd("~/.config/waybar/scripts/waybar-toggle.sh"))

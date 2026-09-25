@@ -7,4 +7,4 @@ end
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd(formatIPC("power-panel")))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(formatIPC("wifi")))
 hl.bind(mainMod .. " + RETURN", hl.dsp.exec_cmd(formatIPC("app-launcher")))
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(formatIPC("screenshot")))
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd(formatIPC("screenshot")))
