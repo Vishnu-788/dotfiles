@@ -300,7 +300,8 @@ PanelWindow {
                 left: parent.left
                 right: parent.right
                 bottom: parent.bottom
-                margins: 12
+                topMargin: 12
+                bottomMargin: 12
             }
             spacing: 4
             clip: true
@@ -329,7 +330,6 @@ PanelWindow {
 
                 Rectangle {
                     anchors.fill: parent
-                    radius: 12
                     color: actionRow.selected ? root.colBgDim : "transparent"
                     Behavior on color {
                         ColorAnimation {
